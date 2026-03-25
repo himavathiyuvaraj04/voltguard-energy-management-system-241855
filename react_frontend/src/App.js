@@ -126,6 +126,8 @@ function App() {
     }
   }
 
+  const anyFetching = loading.analytics || loading.alerts;
+
   return (
     <div className="App">
       <header className="App-header" style={{ padding: 24, gap: 16 }}>
@@ -148,18 +150,18 @@ function App() {
             }}
           >
             <div>
-              <h1 style={{ margin: 0, fontSize: 28 }}>VoltGuard Dashboard</h1>
+              <h1 style={{ margin: 0, fontSize: 28 }}>Energy Consumption Dashboard</h1>
               <p style={{ marginTop: 8, opacity: 0.85 }}>
                 Backend: <code>{apiBaseUrl}</code>
               </p>
             </div>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center" }} aria-label="Notifications">
-              <span style={{ fontWeight: 700 }}>Alerts</span>
+              <span style={{ fontWeight: 800 }}>Alerts</span>
               <span
                 aria-label={`${unreadCount} unread alerts`}
                 style={{
-                  minWidth: 26,
+                  minWidth: 28,
                   height: 22,
                   padding: "0 8px",
                   display: "inline-flex",
@@ -167,16 +169,43 @@ function App() {
                   justifyContent: "center",
                   borderRadius: 999,
                   fontSize: 12,
-                  fontWeight: 800,
+                  fontWeight: 900,
                   border: "1px solid var(--border-color)",
-                  background: unreadCount > 0 ? "rgba(239, 68, 68, 0.14)" : "var(--bg-secondary)",
-                  color: unreadCount > 0 ? "var(--text-primary)" : "rgba(100, 116, 139, 1)",
+                  // Always visible; use higher contrast when unread > 0
+                  background: unreadCount > 0 ? "rgba(239, 68, 68, 0.16)" : "rgba(100, 116, 139, 0.10)",
+                  color: "var(--text-primary)",
                 }}
               >
                 {unreadCount}
               </span>
             </div>
           </div>
+
+          {/* Minimal loading indicator while fetching analytics/alerts */}
+          {anyFetching && (
+            <div
+              role="status"
+              aria-live="polite"
+              style={{
+                marginTop: 12,
+                padding: "8px 12px",
+                borderRadius: 10,
+                border: "1px solid var(--border-color)",
+                background: "rgba(100, 116, 139, 0.10)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+              }}
+            >
+              <span style={{ fontWeight: 700, opacity: 0.9 }}>Loading…</span>
+              <span style={{ fontSize: 12, opacity: 0.75 }}>
+                {loading.analytics && "Analytics"}
+                {loading.analytics && loading.alerts ? " + " : ""}
+                {loading.alerts && "Alerts"}
+              </span>
+            </div>
+          )}
 
           {message && (
             <div
@@ -220,7 +249,9 @@ function App() {
           </section>
 
           <section style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border-color)" }}>
-            <h2 style={{ margin: "0 0 8px 0", fontSize: 18 }}>2) Analytics</h2>
+            <h2 style={{ margin: "0 0 8px 0", fontSize: 18 }}>
+              2) Analytics
+            </h2>
             <button
               className="theme-toggle"
               style={{ position: "static", marginBottom: 12 }}
@@ -247,7 +278,7 @@ function App() {
 
           <section style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border-color)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-              <h2 style={{ margin: "0 0 8px 0", fontSize: 18 }}>3) Alerts</h2>
+              <h2 style={{ margin: "0 0 8px 0", fontSize: 18 }}>Anomaly Alerts</h2>
               <button
                 className="theme-toggle"
                 style={{ position: "static", marginBottom: 12 }}
@@ -287,9 +318,7 @@ function App() {
                       >
                         <div style={{ minWidth: 0 }}>
                           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                            <span style={{ fontWeight: unread ? 800 : 700 }}>
-                              {a.site || "Unknown site"}
-                            </span>
+                            <span style={{ fontWeight: unread ? 800 : 700 }}>{a.site || "Unknown site"}</span>
                             <span style={{ opacity: 0.85 }}>{a.date || "—"}</span>
                             {unread && (
                               <span
@@ -310,11 +339,17 @@ function App() {
                           <div style={{ marginTop: 6, opacity: 0.9, display: "flex", gap: 10, flexWrap: "wrap" }}>
                             <span>
                               Deviation:{" "}
-                              <strong style={{ fontWeight: 900 }}>{formatDeviationPct(a.deviationPct)}</strong>
+                              <strong
+                                style={{
+                                  fontWeight: 900,
+                                  // Anomaly styling: deviation shown in red for quick demo impact
+                                  color: "rgba(239, 68, 68, 1)",
+                                }}
+                              >
+                                {formatDeviationPct(a.deviationPct)}
+                              </strong>
                             </span>
-                            <span style={{ opacity: 0.7 }}>
-                              Customer: {a.customer || "—"}
-                            </span>
+                            <span style={{ opacity: 0.7 }}>Customer: {a.customer || "—"}</span>
                           </div>
                         </div>
 

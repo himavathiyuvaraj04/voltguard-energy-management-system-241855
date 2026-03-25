@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-test("renders VoltGuard dashboard heading", () => {
+test("renders Energy Consumption Dashboard heading", () => {
   render(<App />);
-  const heading = screen.getByText(/VoltGuard Dashboard/i);
+  const heading = screen.getByText(/Energy Consumption Dashboard/i);
   expect(heading).toBeInTheDocument();
 });
